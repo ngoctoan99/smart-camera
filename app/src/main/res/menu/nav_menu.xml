@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <item
+            android:title="Feature">
+                <menu>
+                        <group android:checkableBehavior="single"
+                    >
+                        <item
+                            android:id="@+id/fragment_recognizeText"
+                            android:title="Recognize Text"
+                            android:icon="@drawable/ic_baseline_image_search_24"/>
+                        <item
+                            android:id="@+id/fragment_countFace"
+                            android:title="Count Face"
+                            android:icon="@drawable/ic_baseline_tag_faces_24"/>
+                </group>
+                </menu>
+        </item>
+        <item android:title="Sub items">
+                <menu>
+                        <group android:checkableBehavior="single">
+                                <item
+                                    android:id="@+id/fragment_qr_scanner"
+                                    android:icon="@drawable/ic_baseline_qr_code_scanner_24"
+                                    android:title="QR Scanner" />
+                                <item
+                                    android:id="@+id/fragment_qr_general"
+                                    android:icon="@drawable/ic_baseline_qr_code_2_24"
+                                    android:title="QR General" />
+                        </group>
+                </menu>
+        </item>
+</menu>

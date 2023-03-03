@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Smart Camera</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="recognize_text">Recognize Text</string>
+    <string name="recognize_text_take_a_picture">Take a picture</string>
+    <string name="pre"><![CDATA[<]]></string>
+    <string name="next"><![CDATA[>]]></string>
+</resources>
