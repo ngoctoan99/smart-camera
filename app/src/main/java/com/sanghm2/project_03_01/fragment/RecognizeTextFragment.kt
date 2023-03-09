@@ -1,7 +1,6 @@
-package com.sanghm2.project_03_01.screen
+package com.sanghm2.project_03_01.fragment
 
 import android.Manifest
-import android.R.attr.label
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.*
@@ -20,7 +19,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition

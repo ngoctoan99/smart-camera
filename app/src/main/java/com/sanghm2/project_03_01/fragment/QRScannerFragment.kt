@@ -1,4 +1,4 @@
-package com.sanghm2.project_03_01.screen
+package com.sanghm2.project_03_01.fragment
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -18,11 +17,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.budiyev.android.codescanner.AutoFocusMode
 import com.budiyev.android.codescanner.CodeScanner
-import com.budiyev.android.codescanner.CodeScannerView
 import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
-import com.sanghm2.project_03_01.R
 import com.sanghm2.project_03_01.databinding.FragmentQRScannerBinding
 import java.util.regex.Pattern
 

@@ -1,7 +1,6 @@
-package com.sanghm2.project_03_01.screen
+package com.sanghm2.project_03_01.fragment
 
 import android.Manifest
-import android.content.ContextWrapper
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -21,7 +20,6 @@ import androidx.core.content.ContextCompat
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
 import com.google.zxing.qrcode.QRCodeWriter
-import com.sanghm2.project_03_01.R
 import com.sanghm2.project_03_01.databinding.FragmentQRGeneratorBinding
 import java.io.File
 import java.io.FileOutputStream
@@ -94,14 +92,16 @@ class QRGeneratorFragment : Fragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
     private fun saveImage(){
+        val timeStamp = System.currentTimeMillis()
         val externalStorageState = Environment.getExternalStorageState()
         if(externalStorageState.equals(Environment.MEDIA_MOUNTED)){
-            val storageDirectory = Environment.getExternalStorageDirectory().absolutePath.toString()
-            val file = File(storageDirectory,"qrcode"+".jpg")
+            val storageDirectory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"QR Generator")
+            storageDirectory.mkdirs()
+            val file = File(storageDirectory, "$timeStamp.png")
             try {
                 val stream : OutputStream = FileOutputStream(file)
                 val bitmap : Bitmap = (binding.imageQrcode.drawable as BitmapDrawable).bitmap
-                bitmap.compress(Bitmap.CompressFormat.JPEG,100,stream)
+                bitmap.compress(Bitmap.CompressFormat.PNG,90,stream)
                 stream.flush()
                 stream.close()
                 MediaStore.Images.Media.insertImage(requireActivity().contentResolver, file.absolutePath,file.name,file.name)

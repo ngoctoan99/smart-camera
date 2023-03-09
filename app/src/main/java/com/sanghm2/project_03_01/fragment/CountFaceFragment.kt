@@ -1,4 +1,4 @@
-package com.sanghm2.project_03_01.screen
+package com.sanghm2.project_03_01.fragment
 
 import android.Manifest
 import android.app.Activity
@@ -27,7 +27,6 @@ import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.face.FaceDetectorOptions
-import com.google.mlkit.vision.text.TextRecognizer
 import com.sanghm2.project_03_01.R
 import com.sanghm2.project_03_01.databinding.FragmentCountFaceBinding
 

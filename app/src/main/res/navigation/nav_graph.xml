@@ -8,22 +8,27 @@
 
     <fragment
         android:id="@+id/fragment_countFace"
-        android:name="com.sanghm2.project_03_01.screen.CountFaceFragment"
+        android:name="com.sanghm2.project_03_01.fragment.CountFaceFragment"
         android:label="Count Face"
         tools:layout="@layout/fragment_count_face" />
     <fragment
         android:id="@+id/fragment_recognizeText"
-        android:name="com.sanghm2.project_03_01.screen.RecognizeTextFragment"
+        android:name="com.sanghm2.project_03_01.fragment.RecognizeTextFragment"
         android:label="Recognize Text"
         tools:layout="@layout/fragment_recognize_text" />
     <fragment
         android:id="@+id/fragment_qr_general"
-        android:name="com.sanghm2.project_03_01.screen.QRGeneratorFragment"
+        android:name="com.sanghm2.project_03_01.fragment.QRGeneratorFragment"
         android:label="QR General"
         tools:layout="@layout/fragment_q_r_generator" />
     <fragment
         android:id="@+id/fragment_qr_scanner"
-        android:name="com.sanghm2.project_03_01.screen.QRScannerFragment"
+        android:name="com.sanghm2.project_03_01.fragment.QRScannerFragment"
         android:label="QR Scanner"
         tools:layout="@layout/fragment_q_r_scanner" />
+    <fragment
+        android:id="@+id/fragment_qr_archive"
+        android:name="com.sanghm2.project_03_01.fragment.QrArchiveFragment"
+        android:label="QR Archive"
+        tools:layout="@layout/fragment_qr_archive" />
 </navigation>
