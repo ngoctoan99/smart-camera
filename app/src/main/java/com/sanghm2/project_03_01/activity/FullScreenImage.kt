@@ -19,7 +19,7 @@ class FullScreenImage : AppCompatActivity() {
         actionBar.hide()
         imageLink = ""+intent.getStringExtra("uri")
         loadImageFull()
-        binding.goback.setOnClickListener {
+        binding.btnBack.setOnClickListener {
             onBackPressed()
         }
     }

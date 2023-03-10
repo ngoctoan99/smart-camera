@@ -3,9 +3,31 @@
     <string name="open">Open</string>
     <string name="close">Close</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="recognize_text">Recognize Text</string>
     <string name="recognize_text_take_a_picture">Take a picture</string>
     <string name="pre"><![CDATA[<]]></string>
     <string name="next"><![CDATA[>]]></string>
+    <string name="menu_recognize_text">Recognize Text</string>
+    <string name="menu_count_face">Count Face</string>
+    <string name="menu_qr_scanner">QR Scanner</string>
+    <string name="menu_qr_general">QR General</string>
+    <string name="menu_qr_archive">QR Archive</string>
+    <string name="menu_extended_features">Extended Features</string>
+    <string name="qr_generator_text_hint">Enter your text or link to generate Qr Code</string>
+    <string name="qr_generator_text_btn">Generator QR Code</string>
+    <string name="qr_result_scanner">result</string>
+    <string name="recognize_text_pick_image">Take a picture</string>
+    <string name="recognize_text_recoginize">Recognize text</string>
+    <string name="recognize_text_before_result">Recognize Text:</string>
+    <string name="recoginize_text_ok">ok</string>
+    <string name="recognize_text_copy">Copy</string>
+    <string name="splash_developer_text">Developed by Toan</string>
+    <string name="splash_note_text">Apps that make the camera smarter</string>
+    <string name="splash_caption_text">Smart Camera</string>
+    <string name="detect_face_btn_text">Detect Face</string>
+    <string name="count_face_pick_image_text">Click here add image to detect face</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="menu_object_recognition">Object Recognition</string>
+    <string name="object_recognition_btn_text">Object Recognition</string>
 </resources>

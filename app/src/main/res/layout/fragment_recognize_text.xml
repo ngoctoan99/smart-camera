@@ -20,7 +20,7 @@
                 android:layout_weight="1"
                 android:layout_marginEnd="5dp"
                 app:icon="@drawable/ic_baseline_add_a_photo_24"
-                android:text="Take a picture"
+                android:text="@string/recognize_text_pick_image"
                 android:backgroundTint="@color/black"
                 android:textAllCaps="false"
                 android:layout_height="wrap_content"/>
@@ -31,7 +31,7 @@
                 android:backgroundTint="@color/black"
                 app:icon="@drawable/ic_baseline_document_scanner_24"
                 android:layout_marginStart="5dp"
-                android:text="Recognize text"
+                android:text="@string/recognize_text_recoginize"
                 android:textAllCaps="false"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
@@ -53,7 +53,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="Recognize Text: "
+                    android:text="@string/recognize_text_before_result"
                     style="@style/TextAppearance.MaterialComponents.Headline6"/>
                 <EditText
                     android:layout_width="match_parent"
@@ -68,7 +68,7 @@
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="ok"
+                        android:text="@string/recoginize_text_ok"
                         android:layout_weight="1"
                         android:layout_marginStart="30dp"
                         android:layout_marginEnd="80dp"
@@ -78,7 +78,7 @@
                     <Button
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Copy"
+                        android:text="@string/recognize_text_copy"
                         android:layout_weight="1"
                         android:layout_marginEnd="30dp"
                         android:id="@+id/copyBtn"

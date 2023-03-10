@@ -20,6 +20,7 @@ import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
+import com.sanghm2.project_03_01.R
 import com.sanghm2.project_03_01.databinding.FragmentQRScannerBinding
 import java.util.regex.Pattern
 

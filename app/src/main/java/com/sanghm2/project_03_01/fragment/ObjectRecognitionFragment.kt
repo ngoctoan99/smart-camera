@@ -3,13 +3,16 @@ package com.sanghm2.project_03_01.fragment
 import android.Manifest
 import android.app.Activity
 import android.app.ProgressDialog
-import android.content.*
+import android.content.ContentValues
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.View
@@ -19,28 +22,26 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.TextRecognizer
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import com.google.mlkit.vision.label.ImageLabeler
+import com.google.mlkit.vision.label.ImageLabeling
+import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import com.sanghm2.project_03_01.R
-import com.sanghm2.project_03_01.databinding.FragmentRecognizeTextBinding
+import com.sanghm2.project_03_01.databinding.FragmentObjectRecognitionBinding
 
+class ObjectRecognitionFragment : Fragment() {
 
-class RecognizeTextFragment : Fragment() {
-    private lateinit var binding :FragmentRecognizeTextBinding
-    private companion object {
+    private lateinit var binding : FragmentObjectRecognitionBinding
+    private lateinit var imageLabeler : ImageLabeler
+    private lateinit var progressDialog : ProgressDialog
+
+    private companion object{
         private const val  CAMERA_REQUEST_CODE = 100
         private const val  STORAGE_REQUEST_CODE = 101
     }
-
     private var  imageUri : Uri? = null
     private lateinit var cameraPermission : Array<String>
     private lateinit var storagePermission : Array<String>
-    private lateinit var textRecognize : TextRecognizer
-    private lateinit var progressDialog : ProgressDialog
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -49,67 +50,62 @@ class RecognizeTextFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        requireActivity().overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_left)
-        binding = FragmentRecognizeTextBinding.inflate(LayoutInflater.from(context),container,false)
-        cameraPermission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        storagePermission = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        binding = FragmentObjectRecognitionBinding.inflate(LayoutInflater.from(context), container , false)
         progressDialog = ProgressDialog(context)
-        progressDialog.setTitle("Please wait")
+        progressDialog.setTitle("Please wait...")
         progressDialog.setCanceledOnTouchOutside(false)
 
-        textRecognize = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
-        binding.takePictureBtn.setOnClickListener {
-            showInputImageDialog()
-        }
+        imageLabeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
 
-        binding.recognizeTextBtn.setOnClickListener {
-            if(imageUri == null){
-                showToast("Pick Image First...")
+//        val imageLabelerOptions = ImageLabelerOptions.Builder()
+//            .setConfidenceThreshold(0.8f)
+//            .build()
+//        imageLabeler =  ImageLabeling.getClient(imageLabelerOptions)
+
+//        val bitmap1 = BitmapFactory.decodeResource(resources, R.drawable.cake)
+//
+//        val imageUri : Uri? = null
+
+//        val bitmapDrawable = binding.imageTv.drawable as BitmapDrawable
+//        val bitmap3 = bitmapDrawable.bitmap
+        binding.btnRecognition.setOnClickListener {
+            binding.resultTv.text = ""
+            if(imageUri != null){
+                val bitmap2 = MediaStore.Images.Media.getBitmap(requireContext().contentResolver , imageUri)
+                labelImage(bitmap2)
             }else {
-                recognizeTextFromImage()
+                showToast("Pick First Image")
             }
         }
-        binding.finishBtn.setOnClickListener {
-            binding.recognizeTextEdit.setText("")
-            binding.imageIv.setImageResource(R.drawable.ic_baseline_image_24)
-            imageUri = null
-        }
-        binding.copyBtn.setOnClickListener {
-           if(binding.recognizeTextEdit.text.toString().trim().isNotEmpty()){
-               val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-               clipboardManager.setPrimaryClip(ClipData.newPlainText("", binding.recognizeTextEdit.text.toString().trim()))
-               if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
-                   Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show()
-           }else {
-               Toast.makeText(context,"Empty",Toast.LENGTH_SHORT).show()
-           }
+        binding.imageTv.setOnClickListener {
+            showInputImageDialog()
         }
         return binding.root
     }
 
-    private fun recognizeTextFromImage() {
-        progressDialog.setMessage("Preparing Image...")
+    private fun labelImage(bitmap : Bitmap){
+        progressDialog.setMessage("Preparing image...")
         progressDialog.show()
-        try {
-            val  inputImage = InputImage.fromFilePath(requireContext(),imageUri!!)
-            progressDialog.setMessage("Recognize text...")
-            val textTaskResult = textRecognize.process(inputImage)
-                .addOnSuccessListener {
-                    val recognizeText  = it.text
-                    binding.recognizeTextEdit.setText(recognizeText)
-                    progressDialog.dismiss()
-                }.addOnFailureListener {
-                    progressDialog.dismiss()
-                    showToast("Failed to recognize text due to  ${it.message}")
-                }
-        }catch (e: Exception){
-            showToast("Fail to prepare image due to ${e.message}")
+        val inputImage = InputImage.fromBitmap(bitmap,0)
+        progressDialog.setMessage("Recognition Image...")
+        imageLabeler.process(inputImage).addOnSuccessListener { imageLabels ->
+            for(imageLabel in imageLabels){
+                val text = imageLabel.text
+                val confidence = imageLabel.confidence
+                val index = imageLabel.index
+                binding.resultTv.append("text: $text  \nconfidence: $confidence \nindex: $index\n\n")
+            }
+            progressDialog.dismiss()
+
+        }.addOnFailureListener {
+            progressDialog.dismiss()
+            Toast.makeText(context , "$it",Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun showInputImageDialog() {
-        val popupMenu = PopupMenu(context, binding.takePictureBtn)
+        val popupMenu = PopupMenu(context, binding.imageTv)
 
         popupMenu.menu.add(Menu.NONE , 1,1,"CAMERA")
         popupMenu.menu.add(Menu.NONE , 2,2,"GALLERY")
@@ -120,6 +116,7 @@ class RecognizeTextFragment : Fragment() {
             if(id == 1){
                 if(checkCameraPermission()){
                     pickImageCamera()
+
                 }else {
                     requestCameraPermission()
                 }
@@ -134,18 +131,17 @@ class RecognizeTextFragment : Fragment() {
             return@setOnMenuItemClickListener true
         }
     }
-
-
     private fun pickImageGallery(){
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
         galleryActivityResultLauncher.launch(intent)
+        binding.layoutGlide.visibility = View.GONE
     }
     private val galleryActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
         if(result.resultCode == Activity.RESULT_OK){
             val data = result.data
             imageUri = data!!.data
-            binding.imageIv.setImageURI(imageUri)
+            binding.imageTv.setImageURI(imageUri)
         }else {
 
         }
@@ -159,10 +155,11 @@ class RecognizeTextFragment : Fragment() {
         val intent  = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         intent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri)
         cameraActivityResultLauncher.launch(intent)
+        binding.layoutGlide.visibility = View.GONE
     }
     private val cameraActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
         if(result.resultCode == Activity.RESULT_OK){
-            binding.imageIv.setImageURI(imageUri)
+            binding.imageTv.setImageURI(imageUri)
         }else {
             showToast("Cancelled....")
         }
@@ -178,10 +175,12 @@ class RecognizeTextFragment : Fragment() {
     }
 
     private fun requestStoragePermission(){
-        ActivityCompat.requestPermissions(context as Activity,storagePermission, STORAGE_REQUEST_CODE)
+        ActivityCompat.requestPermissions(context as Activity,storagePermission, STORAGE_REQUEST_CODE
+        )
     }
     private fun requestCameraPermission(){
-        ActivityCompat.requestPermissions(context as Activity,cameraPermission, CAMERA_REQUEST_CODE)
+        ActivityCompat.requestPermissions(context as Activity,cameraPermission, CAMERA_REQUEST_CODE
+        )
     }
 
     override fun onRequestPermissionsResult(
@@ -202,7 +201,7 @@ class RecognizeTextFragment : Fragment() {
                     }
                 }
             }
-            STORAGE_REQUEST_CODE->{
+            STORAGE_REQUEST_CODE ->{
                 if(grantResults.isNotEmpty()){
                     val storageAccepted  = grantResults[0] == PackageManager.PERMISSION_GRANTED
                     if(storageAccepted){
@@ -217,4 +216,5 @@ class RecognizeTextFragment : Fragment() {
     private fun showToast(message: String){
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }
+
 }

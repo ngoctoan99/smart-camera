@@ -34,7 +34,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="30dp"
-            android:text="result"
+            android:text="@string/qr_result_scanner"
             android:textColor="@color/white"
             android:textSize="15dp" />
         <ImageButton

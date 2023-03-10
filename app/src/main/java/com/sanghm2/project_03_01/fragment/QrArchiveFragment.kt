@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.sanghm2.project_03_01.AdapterImageArchive
+import com.sanghm2.project_03_01.R
 import com.sanghm2.project_03_01.databinding.FragmentQrArchiveBinding
 import com.sanghm2.project_03_01.model.ModelImage
 import java.io.File
@@ -33,8 +34,8 @@ class QrArchiveFragment : Fragment() {
 
     private fun loadImage(){
         imageArrayList = ArrayList()
-//        adapterImage = AdapterImageArchive(requireContext(),imageArrayList)
-//        binding.qrRv.adapter = adapterImage
+        adapterImage = AdapterImageArchive(requireContext(),imageArrayList)
+        binding.qrRv.adapter = adapterImage
         val folder = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),"QR Generator")
         if(folder.exists()){
             val files = folder.listFiles()
@@ -48,11 +49,8 @@ class QrArchiveFragment : Fragment() {
                     val uri = Uri.fromFile(fileEntry)
                     val model = ModelImage(fileEntry,uri)
                     imageArrayList.add(model)
-//                    Log.d("toandatafile",model.toString())
-//                    adapterImage.notifyItemInserted(imageArrayList.size)
-                    adapterImage = AdapterImageArchive(requireContext(),imageArrayList)
-                    binding.qrRv.adapter = adapterImage
-                    checkList()
+                    Log.d("toandatafile",model.toString())
+                    adapterImage.notifyItemInserted(imageArrayList.size)
                 }
             }
         }else {
@@ -61,13 +59,4 @@ class QrArchiveFragment : Fragment() {
         }
     }
 
-    private fun checkList(){
-        if(imageArrayList.size <= 0){
-            binding.emptyList.visibility = View.VISIBLE
-            binding.qrRv.visibility = View.GONE
-        }else {
-            binding.emptyList.visibility = View.GONE
-            binding.qrRv.visibility = View.VISIBLE
-        }
-    }
 }

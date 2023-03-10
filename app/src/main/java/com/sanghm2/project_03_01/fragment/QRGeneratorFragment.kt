@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
 import com.google.zxing.qrcode.QRCodeWriter
+import com.sanghm2.project_03_01.R
 import com.sanghm2.project_03_01.databinding.FragmentQRGeneratorBinding
 import java.io.File
 import java.io.FileOutputStream

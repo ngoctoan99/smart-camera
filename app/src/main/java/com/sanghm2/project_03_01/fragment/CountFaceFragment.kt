@@ -53,8 +53,7 @@ class CountFaceFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-         binding  = FragmentCountFaceBinding.inflate(layoutInflater, container, false)
-
+        binding  = FragmentCountFaceBinding.inflate(layoutInflater, container, false)
         cameraPermission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
         storagePermission = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         progressDialog = ProgressDialog(context)
@@ -114,6 +113,7 @@ class CountFaceFragment : Fragment() {
             Log.d(TAG, "anlyzePhoto: Number of faces   ${faces.size}")
             val string  = "Have ${faces.size} face in the picture"
             binding.countFaceTv.text = string
+            binding.countFaceTv.visibility=  View.VISIBLE
 
             cropDetectedFace(bitmap,faces,position)
 
@@ -134,7 +134,7 @@ class CountFaceFragment : Fragment() {
             }
         }.addOnFailureListener { e->
             Log.e(TAG, "anlyzePhoto: ", e)
-            Toast.makeText(context, "Failed due to  ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -156,7 +156,7 @@ class CountFaceFragment : Fragment() {
             binding.croppedIv.setImageBitmap(croppedBitmap)
         }
         else {
-            Toast.makeText(context,"Don't  detect the face",Toast.LENGTH_SHORT).show()
+            Toast.makeText(context,"Please choose a photo where you can see your face clearly",Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -172,6 +172,7 @@ class CountFaceFragment : Fragment() {
             if(id == 1){
                 if(checkCameraPermission()){
                     pickImageCamera()
+
                 }else {
                     requestCameraPermission()
                 }
@@ -190,6 +191,9 @@ class CountFaceFragment : Fragment() {
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
         galleryActivityResultLauncher.launch(intent)
+        binding.countFaceTv.visibility = View.GONE
+        binding.arrowUp.visibility = View.GONE
+        binding.textPickImage.visibility = View.GONE
     }
     private val galleryActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
         if(result.resultCode == Activity.RESULT_OK){
@@ -209,6 +213,9 @@ class CountFaceFragment : Fragment() {
         val intent  = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         intent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri)
         cameraActivityResultLauncher.launch(intent)
+        binding.countFaceTv.visibility = View.GONE
+        binding.arrowUp.visibility = View.GONE
+        binding.textPickImage.visibility = View.GONE
     }
     private val cameraActivityResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){ result ->
         if(result.resultCode == Activity.RESULT_OK){

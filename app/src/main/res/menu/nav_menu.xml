@@ -2,36 +2,40 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
         <item
-            android:title="Ai Camera">
+            android:title="@string/menu_extended_features">
                 <menu>
                         <group android:checkableBehavior="single"
                     >
                         <item
                             android:id="@+id/fragment_recognizeText"
-                            android:title="Recognize Text"
+                            android:title="@string/menu_recognize_text"
                             android:icon="@drawable/ic_baseline_image_search_24"/>
                         <item
                             android:id="@+id/fragment_countFace"
-                            android:title="Count Face"
+                            android:title="@string/menu_count_face"
                             android:icon="@drawable/ic_baseline_tag_faces_24"/>
+                                <item
+                                    android:id="@+id/fragment_object_recognition"
+                                    android:title="@string/menu_object_recognition"
+                                    android:icon="@drawable/ic_baseline_emoji_objects_24"/>
                 </group>
                 </menu>
         </item>
-        <item android:title="QR Options">
+        <item android:title="QR Features">
                 <menu>
                         <group android:checkableBehavior="single">
                                 <item
                                     android:id="@+id/fragment_qr_scanner"
                                     android:icon="@drawable/ic_baseline_qr_code_scanner_24"
-                                    android:title="QR Scanner" />
+                                    android:title="@string/menu_qr_scanner" />
                                 <item
                                     android:id="@+id/fragment_qr_general"
                                     android:icon="@drawable/ic_baseline_qr_code_2_24"
-                                    android:title="QR General" />
+                                    android:title="@string/menu_qr_general" />
                                 <item
                                     android:id="@+id/fragment_qr_archive"
                                     android:icon="@drawable/ic_baseline_archive_24"
-                                    android:title="QR Archive" />
+                                    android:title="@string/menu_qr_archive" />
                         </group>
                 </menu>
         </item>

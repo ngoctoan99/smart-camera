@@ -31,4 +31,9 @@
         android:name="com.sanghm2.project_03_01.fragment.QrArchiveFragment"
         android:label="QR Archive"
         tools:layout="@layout/fragment_qr_archive" />
+    <fragment
+        android:id="@+id/fragment_object_recognition"
+        android:name="com.sanghm2.project_03_01.fragment.ObjectRecognitionFragment"
+        android:label="Object Recognition"
+        tools:layout="@layout/fragment_object_recognition" />
 </navigation>
