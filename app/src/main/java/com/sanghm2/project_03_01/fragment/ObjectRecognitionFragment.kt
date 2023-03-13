@@ -51,24 +51,11 @@ class ObjectRecognitionFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentObjectRecognitionBinding.inflate(LayoutInflater.from(context), container , false)
-        progressDialog = ProgressDialog(context)
-        progressDialog.setTitle("Please wait...")
-        progressDialog.setCanceledOnTouchOutside(false)
-
-
-        imageLabeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
-
-//        val imageLabelerOptions = ImageLabelerOptions.Builder()
-//            .setConfidenceThreshold(0.8f)
-//            .build()
-//        imageLabeler =  ImageLabeling.getClient(imageLabelerOptions)
-
-//        val bitmap1 = BitmapFactory.decodeResource(resources, R.drawable.cake)
-//
-//        val imageUri : Uri? = null
-
-//        val bitmapDrawable = binding.imageTv.drawable as BitmapDrawable
-//        val bitmap3 = bitmapDrawable.bitmap
+       initSetup()
+        actionView()
+        return binding.root
+    }
+    private fun actionView(){
         binding.btnRecognition.setOnClickListener {
             binding.resultTv.text = ""
             if(imageUri != null){
@@ -81,9 +68,25 @@ class ObjectRecognitionFragment : Fragment() {
         binding.imageTv.setOnClickListener {
             showInputImageDialog()
         }
-        return binding.root
+    }
+    private fun initSetup(){
+        progressDialog = ProgressDialog(context)
+        progressDialog.setTitle("Please wait...")
+        progressDialog.setCanceledOnTouchOutside(false)
+        imageLabeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+
+//        val imageLabelerOptions = ImageLabelerOptions.Builder()
+//            .setConfidenceThreshold(0.8f)
+//            .build()
+//        imageLabeler =  ImageLabeling.getClient(imageLabelerOptions)
+//        val bitmap1 = BitmapFactory.decodeResource(resources, R.drawable.cake)
+//
+//        val imageUri : Uri? = null
+//        val bitmapDrawable = binding.imageTv.drawable as BitmapDrawable
+//        val bitmap3 = bitmapDrawable.bitmap
     }
 
+    // function use mlkit recognition object from image camera and gallery
     private fun labelImage(bitmap : Bitmap){
         progressDialog.setMessage("Preparing image...")
         progressDialog.show()

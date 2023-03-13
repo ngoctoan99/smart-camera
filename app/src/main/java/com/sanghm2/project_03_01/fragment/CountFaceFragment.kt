@@ -54,20 +54,21 @@ class CountFaceFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding  = FragmentCountFaceBinding.inflate(layoutInflater, container, false)
+        initSetup()
+        actionView()
+        return binding.root
+    }
+    private fun initSetup(){
         cameraPermission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
         storagePermission = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         progressDialog = ProgressDialog(context)
         progressDialog.setTitle("Please wait")
         progressDialog.setCanceledOnTouchOutside(false)
         binding.imageDetectLl.visibility = View.GONE
-        binding.originalIv.setOnClickListener {
-            showInputImageDialog()
-        }
         val realTimeFdo = FaceDetectorOptions.Builder()
             .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
             .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
             .build()
-
         detector = FaceDetection.getClient(realTimeFdo) ;
         // image from drawable
         val bitmap1 = BitmapFactory.decodeResource(resources , R.drawable.newtwoperson);
@@ -76,8 +77,11 @@ class CountFaceFragment : Fragment() {
 //        val bitmap2 = bitmapDrawable.bitmap
 //        //image from URI
 //        val imageUri : Uri?  = null
-
-
+    }
+    private fun actionView(){
+        binding.originalIv.setOnClickListener {
+            showInputImageDialog()
+        }
         binding.detectFacebtn.setOnClickListener {
             try {
                 val bitmap3 = MediaStore.Images.Media.getBitmap(requireContext().contentResolver,imageUri)
@@ -86,9 +90,7 @@ class CountFaceFragment : Fragment() {
                 Log.e(TAG, "onCreate: " ,e)
             }
         }
-        return binding.root
     }
-
     private fun anlyzePhoto(bitmap : Bitmap){
         Log.d(TAG, "analyzePhoto: ")
         val smallerBitmap = Bitmap.createScaledBitmap(
@@ -97,7 +99,10 @@ class CountFaceFragment : Fragment() {
             bitmap.height / SCALING_FATOR,
             false
         )
+        // anlyze image -> bimat to detector image
         val inputImage = InputImage.fromBitmap(smallerBitmap,0)
+
+        //process detector to count face and add face to arraylist
         detector.process(inputImage).addOnSuccessListener {faces ->
             Log.d(TAG, "anlyzePhoto: Successfully detected face ... ")
             Toast.makeText(context, "Face Detected ...", Toast.LENGTH_SHORT).show()
@@ -137,7 +142,7 @@ class CountFaceFragment : Fragment() {
             Toast.makeText(context, "${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
-
+    // show one face from image
     private fun cropDetectedFace(bitmap: Bitmap, faces : List<Face>, position : Int){
         if(faces.isNotEmpty()){
             val rect = faces[position].boundingBox

@@ -37,20 +37,27 @@ class QRScannerFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentQRScannerBinding.inflate(LayoutInflater.from(context), container,false)
-        if(ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED){
-            ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.CAMERA),123)
-        }else {
-            scanning()
-        }
+       initSetup()
+        actionView()
+        return binding.root
+    }
+    private fun actionView(){
         binding.copyBtn.setOnClickListener {
             val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             clipboardManager.setPrimaryClip(ClipData.newPlainText("TextScanner", textResult))
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
                 Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show()
         }
-        return binding.root
+    }
+    private fun initSetup(){
+        if(ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED){
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.CAMERA),123)
+        }else {
+            scanning()
+        }
     }
 
+    /// set up and process scanner use three library
     private fun scanning() {
         ScannerQr = CodeScanner(requireContext(),binding.scannerqr)
         ScannerQr.camera = CodeScanner.CAMERA_BACK
@@ -114,7 +121,11 @@ class QRScannerFragment : Fragment() {
         }
         super.onPause()
     }
+
+    /// check result text or link web
     private fun validationURL(url: String?): Boolean {
+
+        ///regex check https
         val regex = "[(http(s)?):\\/\\/(www\\.)?a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)"
         val p = Pattern.compile(regex)
         val m = p.matcher(url)

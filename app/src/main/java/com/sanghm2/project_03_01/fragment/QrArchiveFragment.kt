@@ -31,7 +31,7 @@ class QrArchiveFragment : Fragment() {
         loadImage()
         return binding.root
     }
-
+    // function load all image create from qr generator
     private fun loadImage(){
         imageArrayList = ArrayList()
         adapterImage = AdapterImageArchive(requireContext(),imageArrayList)

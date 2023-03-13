@@ -44,6 +44,11 @@ class QRGeneratorFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentQRGeneratorBinding.inflate(LayoutInflater.from(context),container,false)
+        actionView()
+        return binding.root
+    }
+    private fun actionView(){
+        // click save image
         binding.imageQrcode.setOnClickListener {
             if(Build.VERSION.SDK_INT  >= Build.VERSION_CODES.M){
                 if(ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
@@ -58,6 +63,8 @@ class QRGeneratorFragment : Fragment() {
             }
         }
         binding.layoutGlide.visibility = View.GONE
+
+        //click to generator qr code image
         binding.btngenerator.setOnClickListener {
             val data = binding.editQrcode.text.toString().trim()
             if(data.isEmpty()){
@@ -96,9 +103,7 @@ class QRGeneratorFragment : Fragment() {
 
             }
         })
-        return binding.root
     }
-
     @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -114,6 +119,8 @@ class QRGeneratorFragment : Fragment() {
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
+    /// function save image to Download local memory
     private fun saveImage(){
         val timeStamp = System.currentTimeMillis()
         val externalStorageState = Environment.getExternalStorageState()

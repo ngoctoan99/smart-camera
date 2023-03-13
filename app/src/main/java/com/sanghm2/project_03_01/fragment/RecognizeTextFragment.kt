@@ -68,12 +68,13 @@ class RecognizeTextFragment : Fragment() {
     ): View? {
         requireActivity().overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_left)
         binding = FragmentRecognizeTextBinding.inflate(LayoutInflater.from(context),container,false)
-        initView()
+        initSetup()
         loadAvailableLanguages()
         actionView()
         return binding.root
     }
 
+    // load all language to translation and add arraylist
     private fun loadAvailableLanguages() {
         languageArrayList = ArrayList()
         val languageCodeList = TranslateLanguage.getAllLanguages()
@@ -151,10 +152,11 @@ class RecognizeTextFragment : Fragment() {
             startTranslation()
         }
     }
-
+    // translate text by model language mlkit
     private fun startTranslation() {
         progressDialog.setMessage("Processing language model...")
         progressDialog.show()
+        //set up option translation
         translatorOptions = TranslatorOptions.Builder()
             .setSourceLanguage(sourceLanguageCode)
             .setTargetLanguage(targetLanguageCode)
@@ -163,7 +165,7 @@ class RecognizeTextFragment : Fragment() {
         val downloadConditions  = DownloadConditions.Builder()
             .requireWifi()
             .build()
-
+        /// process translation text
         translator.downloadModelIfNeeded(downloadConditions).addOnSuccessListener {
             progressDialog.setMessage("Translating...")
             translator.translate(sourceLanguageText).addOnSuccessListener {translatedText ->
@@ -179,7 +181,7 @@ class RecognizeTextFragment : Fragment() {
         }
     }
 
-    private fun initView(){
+    private fun initSetup(){
         cameraPermission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
         storagePermission = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         progressDialog = ProgressDialog(context)
@@ -187,7 +189,7 @@ class RecognizeTextFragment : Fragment() {
         progressDialog.setCanceledOnTouchOutside(false)
         textRecognize = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
     }
-
+    // menu choose source language translation
     private fun sourceLanguageChoose(){
         val popupMenu = PopupMenu(context , binding.sourceLanguageChooseBtn)
 
@@ -207,6 +209,7 @@ class RecognizeTextFragment : Fragment() {
             false
         }
     }
+    // menu choose target language translation
     private fun targetLanguageChoose(){
         val popupMenu = PopupMenu(context , binding.targetLanguageChooseBtn)
 
@@ -226,9 +229,13 @@ class RecognizeTextFragment : Fragment() {
             false
         }
     }
+
+    // recognize Text by text in image
     private fun recognizeTextFromImage() {
         progressDialog.setMessage("Preparing Image...")
         progressDialog.show()
+
+        //process recognize
         try {
             val  inputImage = InputImage.fromFilePath(requireContext(),imageUri!!)
             progressDialog.setMessage("Recognize text...")
@@ -245,8 +252,11 @@ class RecognizeTextFragment : Fragment() {
             showToast("Fail to prepare image due to ${e.message}")
         }
     }
+
+    // automatic recognition language text input to display source language
     private fun languageRecognition(text: String) {
         val languageIdentifier = LanguageIdentification.getClient()
+        //process identify language
         languageIdentifier.identifyPossibleLanguages(text)
             .addOnSuccessListener { identifiedLanguages ->
                 for (identifiedLanguage in identifiedLanguages) {
@@ -266,7 +276,7 @@ class RecognizeTextFragment : Fragment() {
                 Log.d("translatetexterror",it.toString())
             }
     }
-
+    //show options pick image to recognize
     private fun showInputImageDialog() {
         val popupMenu = PopupMenu(context, binding.takePictureBtn)
 
@@ -293,8 +303,8 @@ class RecognizeTextFragment : Fragment() {
             return@setOnMenuItemClickListener true
         }
     }
-
-
+//set up request permission use camera and gallery
+////////////////////////////////////////////////////////
     private fun pickImageGallery(){
         val intent = Intent(Intent.ACTION_PICK)
         intent.type = "image/*"
@@ -373,6 +383,8 @@ class RecognizeTextFragment : Fragment() {
             }
         }
     }
+
+    ////////////////////////////////////////////////////////
     private fun showToast(message: String){
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
     }

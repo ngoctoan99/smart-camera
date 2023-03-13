@@ -18,6 +18,7 @@ class SplashActivity : AppCompatActivity() {
         setContentView(binding.root)
         actionBar = supportActionBar!!
         actionBar.hide()
+        /// handle screen show about 1500  == 1.5s
         Handler().postDelayed(Runnable {
             startActivity(Intent(this , MainActivity::class.java))
             finish()
