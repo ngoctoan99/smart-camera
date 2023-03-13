@@ -19,15 +19,17 @@
     <string name="recognize_text_pick_image">Take a picture</string>
     <string name="recognize_text_recoginize">Recognize text</string>
     <string name="recognize_text_before_result">Recognize Text:</string>
-    <string name="recoginize_text_ok">ok</string>
+    <string name="recoginize_text_ok">finish</string>
     <string name="recognize_text_copy">Copy</string>
     <string name="splash_developer_text">Developed by Toan</string>
     <string name="splash_note_text">Apps that make the camera smarter</string>
     <string name="splash_caption_text">Smart Camera</string>
     <string name="detect_face_btn_text">Detect Face</string>
     <string name="count_face_pick_image_text">Click here add image to detect face</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="menu_object_recognition">Object Recognition</string>
     <string name="object_recognition_btn_text">Object Recognition</string>
+    <string name="source_language_text">Choose</string>
+    <string name="target_language_text">Choose</string>
+    <string name="translate_text">Translate</string>
+    <string name="translate_description">Click here if you want to translate</string>
 </resources>

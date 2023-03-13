@@ -1,6 +1,7 @@
 package com.sanghm2.project_03_01.fragment
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.*
@@ -9,6 +10,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 
 import android.view.LayoutInflater
 import android.view.Menu
@@ -20,12 +24,21 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.mlkit.common.model.DownloadConditions
+import com.google.mlkit.nl.languageid.LanguageIdentification
+import com.google.mlkit.nl.translate.TranslateLanguage
+import com.google.mlkit.nl.translate.Translation
+import com.google.mlkit.nl.translate.Translator
+import com.google.mlkit.nl.translate.TranslatorOptions
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.sanghm2.project_03_01.R
 import com.sanghm2.project_03_01.databinding.FragmentRecognizeTextBinding
+import com.sanghm2.project_03_01.model.ModelLanguage
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class RecognizeTextFragment : Fragment() {
@@ -40,10 +53,14 @@ class RecognizeTextFragment : Fragment() {
     private lateinit var storagePermission : Array<String>
     private lateinit var textRecognize : TextRecognizer
     private lateinit var progressDialog : ProgressDialog
+    private var languageArrayList : ArrayList<ModelLanguage>?= null
+    private var sourceLanguageCode = "en"
+    private var sourceLanguageTitle = "Tiếng Anh"
+    private var targetLanguageCode = "vi"
+    private var targetLanguageTitle = "Tiếng Việt"
+    private lateinit var translatorOptions : TranslatorOptions
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private lateinit var  translator : Translator
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,18 +68,26 @@ class RecognizeTextFragment : Fragment() {
     ): View? {
         requireActivity().overridePendingTransition(R.anim.slide_in_left,R.anim.slide_out_left)
         binding = FragmentRecognizeTextBinding.inflate(LayoutInflater.from(context),container,false)
-        cameraPermission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        storagePermission = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        progressDialog = ProgressDialog(context)
-        progressDialog.setTitle("Please wait")
-        progressDialog.setCanceledOnTouchOutside(false)
+        initView()
+        loadAvailableLanguages()
+        actionView()
+        return binding.root
+    }
 
-        textRecognize = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+    private fun loadAvailableLanguages() {
+        languageArrayList = ArrayList()
+        val languageCodeList = TranslateLanguage.getAllLanguages()
+        for (languageCode in languageCodeList){
+            val languageTitle = Locale(languageCode).displayLanguage
+            val modelLanguage = ModelLanguage(languageCode, languageTitle)
+            languageArrayList!!.add(modelLanguage)
+        }
+    }
 
+    private fun actionView() {
         binding.takePictureBtn.setOnClickListener {
             showInputImageDialog()
         }
-
         binding.recognizeTextBtn.setOnClickListener {
             if(imageUri == null){
                 showToast("Pick Image First...")
@@ -74,20 +99,133 @@ class RecognizeTextFragment : Fragment() {
             binding.recognizeTextEdit.setText("")
             binding.imageIv.setImageResource(R.drawable.ic_baseline_image_24)
             imageUri = null
+            binding.translateTv.text = ""
+            binding.sourceLanguageChooseBtn.text = "Choose"
+            binding.targetLanguageChooseBtn.text = "Choose"
+            binding.translationLl.visibility = View.GONE
+            binding.translateLl.visibility = View.GONE
         }
         binding.copyBtn.setOnClickListener {
-           if(binding.recognizeTextEdit.text.toString().trim().isNotEmpty()){
-               val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-               clipboardManager.setPrimaryClip(ClipData.newPlainText("", binding.recognizeTextEdit.text.toString().trim()))
-               if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
-                   Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show()
-           }else {
-               Toast.makeText(context,"Empty",Toast.LENGTH_SHORT).show()
-           }
+            if(binding.recognizeTextEdit.text.toString().trim().isNotEmpty()){
+                val clipboardManager = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                clipboardManager.setPrimaryClip(ClipData.newPlainText("", binding.recognizeTextEdit.text.toString().trim()))
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2)
+                    Toast.makeText(context, "Copied", Toast.LENGTH_SHORT).show()
+            }else {
+                Toast.makeText(context,"Empty",Toast.LENGTH_SHORT).show()
+            }
         }
-        return binding.root
+        binding.sourceLanguageChooseBtn.setOnClickListener {
+            sourceLanguageChoose()
+        }
+        binding.targetLanguageChooseBtn.setOnClickListener {
+            targetLanguageChoose()
+        }
+        binding.translateBtn.setOnClickListener {
+            validateData()
+        }
+        binding.translationLl.setOnClickListener{
+            binding.translationLl.visibility = View.GONE
+            binding.translateLl.visibility = View.VISIBLE
+        }
+        binding.recognizeTextEdit.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                binding.translationLl.visibility = View.VISIBLE
+                binding.translateLl.visibility = View.GONE
+                languageRecognition(binding.recognizeTextEdit.text.toString().trim())
+            }
+            override fun afterTextChanged(p0: Editable?) {
+            }
+
+        })
+    }
+    private var sourceLanguageText = ""
+    private fun validateData() {
+        sourceLanguageText = binding.recognizeTextEdit.text.toString().trim()
+
+        if (sourceLanguageText.isEmpty()){
+            showToast("Empty")
+        }else {
+            startTranslation()
+        }
     }
 
+    private fun startTranslation() {
+        progressDialog.setMessage("Processing language model...")
+        progressDialog.show()
+        translatorOptions = TranslatorOptions.Builder()
+            .setSourceLanguage(sourceLanguageCode)
+            .setTargetLanguage(targetLanguageCode)
+            .build()
+        translator = Translation.getClient(translatorOptions)
+        val downloadConditions  = DownloadConditions.Builder()
+            .requireWifi()
+            .build()
+
+        translator.downloadModelIfNeeded(downloadConditions).addOnSuccessListener {
+            progressDialog.setMessage("Translating...")
+            translator.translate(sourceLanguageText).addOnSuccessListener {translatedText ->
+                progressDialog.dismiss()
+                binding.translateTv.text = translatedText
+            }.addOnFailureListener {
+                progressDialog.dismiss()
+                showToast("${it.message}")
+            }
+        }.addOnFailureListener {
+            progressDialog.dismiss()
+            showToast("${it.message}")
+        }
+    }
+
+    private fun initView(){
+        cameraPermission = arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        storagePermission = arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        progressDialog = ProgressDialog(context)
+        progressDialog.setTitle("Please wait")
+        progressDialog.setCanceledOnTouchOutside(false)
+        textRecognize = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+    }
+
+    private fun sourceLanguageChoose(){
+        val popupMenu = PopupMenu(context , binding.sourceLanguageChooseBtn)
+
+        for(i in languageArrayList!!.indices){
+            popupMenu.menu.add(Menu.NONE, i, i, languageArrayList!![i].languageTitle)
+        }
+        popupMenu.show()
+
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+            val position  = menuItem.itemId
+            sourceLanguageCode = languageArrayList!![position].languageCode
+            sourceLanguageTitle = languageArrayList!![position].languageTitle
+
+            binding.sourceLanguageChooseBtn.text = sourceLanguageTitle
+
+
+            false
+        }
+    }
+    private fun targetLanguageChoose(){
+        val popupMenu = PopupMenu(context , binding.targetLanguageChooseBtn)
+
+        for(i in languageArrayList!!.indices){
+            popupMenu.menu.add(Menu.NONE, i, i, languageArrayList!![i].languageTitle)
+        }
+        popupMenu.show()
+
+        popupMenu.setOnMenuItemClickListener { menuItem ->
+            val position  = menuItem.itemId
+            targetLanguageCode = languageArrayList!![position].languageCode
+            targetLanguageTitle = languageArrayList!![position].languageTitle
+
+            binding.targetLanguageChooseBtn.text = targetLanguageTitle
+
+
+            false
+        }
+    }
     private fun recognizeTextFromImage() {
         progressDialog.setMessage("Preparing Image...")
         progressDialog.show()
@@ -106,6 +244,27 @@ class RecognizeTextFragment : Fragment() {
         }catch (e: Exception){
             showToast("Fail to prepare image due to ${e.message}")
         }
+    }
+    private fun languageRecognition(text: String) {
+        val languageIdentifier = LanguageIdentification.getClient()
+        languageIdentifier.identifyPossibleLanguages(text)
+            .addOnSuccessListener { identifiedLanguages ->
+                for (identifiedLanguage in identifiedLanguages) {
+//                    val language = identifiedLanguage.languageTag
+                    val language = identifiedLanguages[0].languageTag
+                    val confidence = identifiedLanguage.confidence
+                    Log.d("translatetext", "$language $confidence")
+                    for (i in 0 until languageArrayList!!.size){
+                        if(languageArrayList!![i].languageCode == language){
+                            binding.sourceLanguageChooseBtn.text = languageArrayList!![i].languageTitle
+                            sourceLanguageCode = languageArrayList!![i].languageCode
+                        }
+                    }
+                }
+            }
+            .addOnFailureListener {
+                Log.d("translatetexterror",it.toString())
+            }
     }
 
     private fun showInputImageDialog() {
@@ -216,5 +375,11 @@ class RecognizeTextFragment : Fragment() {
     }
     private fun showToast(message: String){
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.recognizeTextEdit.setText("")
+        binding.translationLl.visibility = View.GONE
     }
 }

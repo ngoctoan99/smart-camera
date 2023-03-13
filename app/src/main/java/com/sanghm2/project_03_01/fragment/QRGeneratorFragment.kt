@@ -1,6 +1,8 @@
 package com.sanghm2.project_03_01.fragment
 
 import android.Manifest
+import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -10,13 +12,17 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
 import com.google.zxing.qrcode.QRCodeWriter
@@ -51,6 +57,7 @@ class QRGeneratorFragment : Fragment() {
                 saveImage()
             }
         }
+        binding.layoutGlide.visibility = View.GONE
         binding.btngenerator.setOnClickListener {
             val data = binding.editQrcode.text.toString().trim()
             if(data.isEmpty()){
@@ -69,11 +76,26 @@ class QRGeneratorFragment : Fragment() {
                     }
                     binding.imageQrcode.setImageBitmap(bmp)
                     binding.editQrcode.setText("")
+                    binding.layoutGlide.visibility = View.VISIBLE
+                    hideKeyboard()
                 }catch (e: WriterException){
                     e.printStackTrace()
                 }
             }
         }
+        binding.editQrcode.addTextChangedListener(object :TextWatcher{
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                binding.layoutGlide.visibility = View.GONE
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+
+            }
+        })
         return binding.root
     }
 
@@ -107,6 +129,7 @@ class QRGeneratorFragment : Fragment() {
                 stream.close()
                 MediaStore.Images.Media.insertImage(requireActivity().contentResolver, file.absolutePath,file.name,file.name)
                 Toast.makeText(context, "Save image successful ${Uri.parse(file.absolutePath)}", Toast.LENGTH_SHORT).show()
+                binding.layoutGlide.visibility = View.GONE
             }catch (e : Exception){
                 e.printStackTrace()
             }
@@ -114,4 +137,17 @@ class QRGeneratorFragment : Fragment() {
             Toast.makeText(context, "Fail to save image", Toast.LENGTH_SHORT).show()
         }
     }
+    fun Fragment.hideKeyboard() {
+        view?.let { activity?.hideKeyboard(it) }
+    }
+
+    fun Activity.hideKeyboard() {
+        hideKeyboard(currentFocus ?: View(this))
+    }
+
+    fun Context.hideKeyboard(view: View) {
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
 }

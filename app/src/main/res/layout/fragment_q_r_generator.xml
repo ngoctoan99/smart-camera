@@ -10,16 +10,17 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@color/white">
+
         <EditText
             android:id="@+id/editQrcode"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:layout_below="@+id/layoutGlide"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="310dp"
             android:layout_marginEnd="10dp"
             android:hint="@string/qr_generator_text_hint"
             android:maxLines="1"
-            android:textStyle="italic"/>
+            android:textStyle="italic" />
 
         <ImageView
             android:id="@+id/imageQrcode"
@@ -31,13 +32,31 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
+        <LinearLayout
+            android:id="@+id/layoutGlide"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageQrcode"
+            android:visibility="gone"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/arrow_up"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_arrow_upward_24"/>
+            <TextView
+                android:id="@+id/text_pick_image"
+                android:layout_width="match_parent"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:text="Click image to save "/>
+        </LinearLayout>
         <Button
             android:id="@+id/btngenerator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/editQrcode"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="380dp"
             android:backgroundTint="@color/black"
             android:text="@string/qr_generator_text_btn"
             android:textAllCaps="false" />
